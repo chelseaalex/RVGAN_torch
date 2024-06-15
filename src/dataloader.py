@@ -14,10 +14,10 @@ def load_real_data(filename):
 
 
     # normalize from [0, 255] to [-1, 1]
-    print(X1)
-    X1 = (X1 - 127.5) / 127.5
-    X2 = (X2 - 127.5) / 127.5
-    X3 = (X3 - 127.5) / 127.5
+    #print(X1)
+    #X1 = (X1 - 127.5) / 127.5
+    #X2 = (X2 - 127.5) / 127.5
+    #X3 = (X3 - 127.5) / 127.5
     
     return [X1, X2, X3]
 

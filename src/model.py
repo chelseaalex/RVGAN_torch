@@ -26,12 +26,10 @@ class NovelResidualBlock(nn.Module):
         self.separable_conv1 = nn.Conv2d(filters, filters, kernel_size=3, stride=1, padding=0, groups=1)
         self.batch_norm1 = nn.BatchNorm2d(filters)
         self.leaky_relu1 = nn.LeakyReLU(0.2)
-
         self.reflection_pad2 = ReflectionPadding2D((1, 1))
         self.separable_conv2 = nn.Conv2d(filters, filters, kernel_size=3, stride=1, padding=0, groups=1)
         self.batch_norm2 = nn.BatchNorm2d(filters)
         self.leaky_relu2 = nn.LeakyReLU(0.2)
-
         self.reflection_pad3 = ReflectionPadding2D((1, 1))
         self.separable_conv3 = nn.Conv2d(filters, filters, kernel_size=3, stride=1, padding=0, groups=1)
         self.batch_norm3 = nn.BatchNorm2d(filters)
@@ -42,19 +40,15 @@ class NovelResidualBlock(nn.Module):
         x1 = self.separable_conv1(x1)
         x1 = self.batch_norm1(x1)
         x1 = self.leaky_relu1(x1)
-
         x2 = self.reflection_pad2(x1)
         x2 = self.separable_conv2(x2)
         x2 = self.batch_norm2(x2)
         x2 = self.leaky_relu2(x2)
-
         x3 = self.reflection_pad3(x)
         x3 = self.separable_conv3(x3)
         x3 = self.batch_norm3(x3)
         x3 = self.leaky_relu3(x3)
-
         x3 = F.interpolate(x3, size=(x2.size(2), x2.size(3)), mode='nearest')
-
         return x + x2 + x3
     
 

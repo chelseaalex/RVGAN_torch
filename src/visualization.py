@@ -25,10 +25,10 @@ def summarize_performance(step, g_global_model, g_local_model, dataset, n_sample
     X_fakeC, _ = generate_fake_data_fine(g_local_model, X_realA, X_realB, x_global, n_patch)
     
     # scale all pixels from [-1,1] to [0,1]
-    X_realA = (X_realA + 1) / 2.0
-    X_realC = (X_realC + 1) / 2.0
-    X_fakeC = (X_fakeC + 1) / 2.0
-
+    X_realA = ((X_realA + 1) / 2 * 255).to(torch.uint8)
+    X_realC = ((X_realC + 1) / 2 * 255).to(torch.uint8)
+    X_fakeC = ((X_fakeC + 1) / 2 * 255).astype(np.uint8)
+    
     # plot real source images
     for i in range(n_samples):
         plt.subplot(3, n_samples, 1 + i)
@@ -72,9 +72,9 @@ def summarize_performance_global(step, g_model, dataset, n_samples=3, savedir='R
     X_fakeC_half, x_global, _ = generate_fake_data_coarse(g_model, X_realA_half, X_realB_half, n_patch)
     
     # scale all pixels from [-1,1] to [0,1]
-    X_realA_half = (X_realA_half + 1) / 2.0
-    X_realC_half = (X_realC_half + 1) / 2.0
-    X_fakeC_half = (X_fakeC_half + 1) / 2.0
+    X_realA_half = ((X_realA_half + 1) / 2 * 255).to(torch.uint8)
+    X_realC_half = ((X_realC_half + 1) / 2 * 255).to(torch.uint8)
+    X_fakeC_half = ((X_fakeC_half + 1) / 2 * 255).astype(np.uint8)
 
     # plot real source images
     for i in range(n_samples):
