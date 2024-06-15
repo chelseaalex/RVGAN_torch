@@ -12,8 +12,11 @@ import gc
 from src.model import CoarseGenerator,FineGenerator,RVGAN,DiscriminatorAE
 from src.visualization import summarize_performance, summarize_performance_global, plot_history, to_csv
 from src.dataloader import resize, generate_fake_data_coarse, generate_fake_data_fine, generate_real_data, generate_real_data_random, load_real_data
+from PIL import Image
+import matplotlib.pyplot as plt
 
-def train(d_model1, d_model2, g_global_model, g_local_model, gan_model, dataset, n_epochs=20, n_batch=1, n_patch=[64, 32], savedir='RVGAN'):
+
+def train(d_model1, d_model2, g_global_model, g_local_model, gan_model, dataset, n_epochs=20, n_batch=8, n_patch=[64, 32], savedir='RVGAN'):
     if not os.path.exists(savedir):
         os.makedirs(savedir)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -37,7 +40,31 @@ def train(d_model1, d_model2, g_global_model, g_local_model, gan_model, dataset,
     for epoch in range(n_epochs):
         for i, data in enumerate(train_loader):
             X_realA, X_realB, X_realC = data
-
+            to_pil = transforms.ToPILImage()
+            
+            """
+            # 输出图像 A
+            print(X_realA[0])
+            imgA = to_pil(((X_realA[0] + 1) / 2 * 255).to(torch.uint8).cpu())
+            plt.figure()
+            plt.title('Image A')
+            plt.imshow(imgA)
+            
+            # 输出图像 B
+            imgB = to_pil(((X_realB[0] + 1) / 2 * 255).to(torch.uint8).cpu())
+            plt.figure()
+            plt.title('Image B')
+            plt.imshow(imgB, cmap='gray')
+            
+            # 输出图像 C
+            imgC = to_pil(((X_realC[0] + 1) / 2 * 255).to(torch.uint8).cpu())
+            plt.figure()
+            plt.title('Image C')
+            plt.imshow(imgC, cmap='gray')
+            
+            # 显示图像
+            plt.show()
+            """
             X_realA = X_realA.float().to(device)
             X_realB = X_realB.float().to(device)
             X_realC = X_realC.float().to(device)
@@ -46,12 +73,8 @@ def train(d_model1, d_model2, g_global_model, g_local_model, gan_model, dataset,
             # Generate fake data for coarse generator
             out_shape = (X_realA.size(2) // 2, X_realA.size(3) // 2)
             X_realA_half, X_realB_half, X_realC_half = resize(X_realA, X_realB, X_realC, out_shape)
-            """
-            X_realA_half
-            X_realB_half
-            X_realC_half
-            out_shape=
-            """
+
+            
             g_global_model=g_global_model.to(device)
             X_fakeC_half, x_global ,y1_coarse = generate_fake_data_coarse(g_global_model, X_realA_half, X_realB_half, n_patch)
             #print(type(X_fakeC_half))
@@ -148,15 +171,15 @@ def train(d_model1, d_model2, g_global_model, g_local_model, gan_model, dataset,
         summarize_performance_global(epoch, g_global_model, dataset, n_samples=3, savedir=savedir)
         summarize_performance(epoch, g_global_model, g_local_model, dataset, n_samples=3, savedir=savedir)
 
-    plot_history(d1_hist, d2_hist, fm1_hist, fm2_hist, g_global_hist, g_local_hist, g_global_recon_hist, g_local_recon_hist, gan_hist, savedir=savedir)
-    to_csv(d1_hist, d2_hist, fm1_hist, fm2_hist, g_global_hist, g_local_hist, g_global_recon_hist, g_local_recon_hist, gan_hist, savedir=savedir)
+    plot_history(d1_hist, d2_hist,d3_hist,d4_hist, fm1_hist, fm2_hist, g_global_hist, g_local_hist, g_global_recon_hist, g_local_recon_hist, gan_hist, savedir=savedir)
+    to_csv(d1_hist, d2_hist,d3_hist,d4_hist, fm1_hist, fm2_hist, g_global_hist, g_local_hist, g_global_recon_hist, g_local_recon_hist, gan_hist, savedir=savedir)
 
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=100)
-    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--batch_size', type=int, default=24)
     parser.add_argument('--npz_file', type=str, default='DRIVE.npz', help='path/to/npz/file')
     parser.add_argument('--input_dim', type=int, default=128)
     parser.add_argument('--savedir', type=str, required=False, help='path/to/save_directory', default='RVGAN')
